@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Check your ping",
   "main": "main.js",
-  "repository": {
-    "url": "https://github.com/FlyTri/PingTester"
-  },
   "scripts": {
     "start": "node ."
   },
