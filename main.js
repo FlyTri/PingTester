@@ -11,12 +11,38 @@ const { Server } = require("socket.io");
 const io = new Server(server, { pingInterval: 10000, pingTimeout: 8000 });
 const connection = {
     connected: 0
+};
+const DDoS = new Map();
+const temp = new Map();
+const maxRequest = 20;
+const inTime = 5000;
+const DDoS_Check = (ip, res, callback) => {
+    if (DDoS.has(ip)) return;
+    let data = temp.get(ip);
+
+    if (data?.count >= maxRequest) {
+        if (data.count === maxRequest) res.sendStatus(403);
+        return DDoS.set(ip);
+    } else {
+        if (!data) data = { count: 0, Timeout: null };
+        data.count++;
+        data.Timeout = setTimeout(() => {
+            clearTimeout(data.Timeout);
+        }, inTime);
+        clearTimeout(data.Timeout);
+        temp.set(ip, data);
+
+        callback();
+    };
 }
 
 app
     .set("view engine", "ejs")
+    .enable("trust proxy")
     .get("/", (req, res) => {
-        res.render(path.join(__dirname + "/views/home.ejs"));
+        DDoS_Check(req.ip, res, () => {
+            res.render(path.join(__dirname + "/views/home.ejs"));
+        });
     })
 
 io

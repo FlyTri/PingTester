@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ping Checker</title>
     <meta name="description" content="Check your latency">
+    <link rel="icon" type="image/x-icon"
+        href="https://img.icons8.com/external-soft-fill-juicy-fish/512/external-ping-sports-soft-fill-soft-fill-juicy-fish-2.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
@@ -83,7 +85,7 @@
         .status {
             position: relative;
             color: gray;
-            transition: 0.2s;
+            transition: 0.3s;
         }
 
         .main {
@@ -98,6 +100,8 @@
             margin-right: auto;
             font-size: 13vh;
             position: relative;
+            transition: 0.5s;
+            color: white;
         }
 
         .smallText {
@@ -130,23 +134,23 @@
             if (id === "upload") {
                 clearTimeout(cache.upload);
                 element.style.color = ok === null ? "yellow" : ok ? "green" : "red";
-                cache.upload = setTimeout(() => {
+                if (ok !== null) cache.upload = setTimeout(() => {
                     element.style.color = "gray";
-                }, 500);
+                }, 300);
             } else {
                 clearTimeout(cache.download);
                 element.style.color = "orange";
                 cache.download = setTimeout(() => {
                     element.style.color = "gray";
                     cache.download = null;
-                }, 500);
+                }, 300);
             };
         };
         const withTimeout = (onSuccess, onTimeout, timeout) => {
             let called = false;
 
             const timer = setTimeout(() => {
-                if (called) return onSuccess();
+                if (called) return;
                 called = true;
                 onTimeout();
             }, timeout);
@@ -165,12 +169,12 @@
                 wifi.style.color = "green";
                 console.log("Socket connected!");
             })
-            .on("disconnect", reason => {
+            .on("disconnect", (reason) => {
                 pingText.innerText = "N/A";
                 wifi.style.color = "red";
                 console.log("Socket disconnected with reason: " + reason || "No reason!");
             })
-            .on("pong", date => {
+            .on("pong", (date) => {
                 toggle(download);
                 let ping = Date.now() - date;
 
