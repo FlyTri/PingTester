@@ -22,6 +22,7 @@ const DDoS_Check = (ip, res, callback) => {
 
     if (data?.count >= maxRequest) {
         if (data.count === maxRequest) res.sendStatus(403);
+        console.log(`IP: `.yellow + `${ip}`.red + ` has been banned!`.yellow)
         return DDoS.set(ip);
     } else {
         if (!data) data = { count: 0, Timeout: null };
