@@ -14,7 +14,7 @@ const connection = {
 };
 const DDoS = new Map();
 const temp = new Map();
-const maxRequest = 20;
+const maxRequest = 50;
 const inTime = 5000;
 const DDoS_Check = (ip, res, callback) => {
     if (DDoS.has(ip)) return;
