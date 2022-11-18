@@ -1,0 +1,23 @@
+{
+  "name": "pingtester",
+  "version": "1.0.0",
+  "description": "Check your ping",
+  "main": "main.js",
+  "repository": {
+    "url": "https://github.com/FlyTri/PingTester"
+  },
+  "scripts": {
+    "start": "node ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "path": "^0.12.7",
+    "socket.io": "^4.5.3"
+  }
+}

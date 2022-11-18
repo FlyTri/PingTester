@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Checker</title>
+    <meta name="description" content="Check your latency">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+</head>
+
+<body>
+    <div class="loader-wrapper">
+        <div class="loader"></div>
+    </div>
+    <nav>
+        <div class="status">
+            <span class="fa-solid fa-wifi" id="wifi"></span>
+            <span class="fa-solid fa-upload" id="upload"></span>
+            <span class="fa-solid fa-download" id="download"></span>
+        </div>
+    </nav>
+    <div class="main">
+        <div><span id="ping" class="ping">NA/N</span><span class="smallText">ms</span></div>
+    </div>
+    <style>
+        @import url("https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap");
+
+        body {
+            font-family: "Poppins";
+            background-color: #0e1525;
+            color: "white";
+            -moz-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .loader-wrapper {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background-color: #0e1525;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid gray;
+            width: 120px;
+            height: 120px;
+            animation: loader 2s linear infinite;
+        }
+
+        @keyframes loader {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+
+        .navbar {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .status {
+            position: relative;
+            color: gray;
+            transition: 0.2s;
+        }
+
+        .main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 85vh;
+        }
+
+        .ping {
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 13vh;
+            position: relative;
+        }
+
+        .smallText {
+            font-size: 7vh;
+            color: gray;
+        }
+    </style>
+</body>
+
+<script>
+    (() => {
+        const socket = io();
+        const loader = document.getElementById("loader");
+        const content = document.getElementById("content");
+        const pingText = document.getElementById("ping");
+        const wifi = document.getElementById("wifi");
+        const upload = document.getElementById("upload");
+        const download = document.getElementById("download");
+        io = () => { throw Error("io() has been removed!") };
+
+        $(document).ready(() => {
+            $(".loader-wrapper").fadeOut("slow");
+        });
+
+        const cache = { upload: null, download: null };
+        const toggle = (element, ok) => {
+            let id = element.id;
+            let color = element.style.color;
+
+            if (id === "upload") {
+                clearTimeout(cache.upload);
+                element.style.color = ok === null ? "yellow" : ok ? "green" : "red";
+                cache.upload = setTimeout(() => {
+                    element.style.color = "gray";
+                }, 500);
+            } else {
+                clearTimeout(cache.download);
+                element.style.color = "orange";
+                cache.download = setTimeout(() => {
+                    element.style.color = "gray";
+                    cache.download = null;
+                }, 500);
+            };
+        };
+        const withTimeout = (onSuccess, onTimeout, timeout) => {
+            let called = false;
+
+            const timer = setTimeout(() => {
+                if (called) return onSuccess();
+                called = true;
+                onTimeout();
+            }, timeout);
+
+            return (...args) => {
+                if (called) return;
+                called = true;
+                clearTimeout(timer);
+                onSuccess.apply(this, args);
+            }
+        };
+
+        socket
+            .on("connect", () => {
+                pingText.innerText = "- -";
+                wifi.style.color = "green";
+                console.log("Socket connected!");
+            })
+            .on("disconnect", reason => {
+                pingText.innerText = "N/A";
+                wifi.style.color = "red";
+                console.log("Socket disconnected with reason: " + reason || "No reason!");
+            })
+            .on("pong", date => {
+                toggle(download);
+                let ping = Date.now() - date;
+
+                pingText.innerText = `${ping}`;
+
+                if (ping <= 150) {
+                    pingText.style.color = "#6cff6b";
+                } else if (ping <= 500) {
+                    pingText.style.color = "#fffc6b";
+                } else {
+                    pingText.style.color = "#ff6b6b";
+                }
+            })
+            .on("pingResult", data => {
+                toggle(download);
+            });
+
+        setInterval(() => {
+            toggle(upload, null);
+            socket.emit("ping", Date.now(), withTimeout(() => {
+                toggle(upload, true);
+            }, () => {
+                toggle(upload, false);
+            }, 2000));
+        }, 3500)
+    })()
+</script>
+
+</html>
