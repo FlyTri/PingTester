@@ -45,6 +45,11 @@ app
             res.render(path.join(__dirname + "/views/home.ejs"));
         });
     })
+    .get("*", (req, res) => {
+        DDoS_Check(req.ip, res, () => {
+            res.render(path.join(__dirname + "/views/404.ejs"));
+        });
+    })
 
 io
     .on("connect", (socket) => {
