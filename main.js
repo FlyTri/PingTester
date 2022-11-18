@@ -27,10 +27,11 @@ const DDoS_Check = (ip, res, callback) => {
     } else {
         if (!data) data = { count: 0, Timeout: null };
         data.count++;
+        clearTimeout(data.Timeout);
         data.Timeout = setTimeout(() => {
             temp.delete(ip);
+            console.log("ended")
         }, inTime);
-        clearTimeout(data.Timeout);
         temp.set(ip, data);
 
         callback();
