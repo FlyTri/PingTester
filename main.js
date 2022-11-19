@@ -14,12 +14,13 @@ const connection = {
 };
 const DDoS = new Map();
 const temp = new Map();
-const maxRequest = 50;
-const inTime = 5000;
+const maxRequest = 10;
+const inTime = 500;
 const DDoS_Check = (ip, res, callback) => {
     if (DDoS.has(ip)) return;
     let data = temp.get(ip);
 
+    console.log(data?.count)
     if (data?.count >= maxRequest) {
         if (data.count === maxRequest) res.sendStatus(403);
         console.log(`[DDOS] IP: `.yellow + `${ip}`.red + ` has been banned!`.yellow)
@@ -27,9 +28,9 @@ const DDoS_Check = (ip, res, callback) => {
     } else {
         if (!data) data = { count: 0, Timeout: null };
         data.count++;
-        clearTimeout(data.Timeout);
-        data.Timeout = setTimeout(() => {
+        if (!data.Timeout) data.Timeout = setTimeout(() => {
             temp.delete(ip);
+            console.log(temp)
         }, inTime);
         temp.set(ip, data);
 
@@ -47,7 +48,7 @@ app
     })
     .get("*", (req, res) => {
         DDoS_Check(req.ip, res, () => {
-            res.render(path.join(__dirname + "/views/404.ejs"));
+            res.status(404).render(path.join(__dirname + "/views/404.ejs"));
         });
     })
 
