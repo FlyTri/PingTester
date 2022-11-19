@@ -35,7 +35,7 @@ const DDoS_Check = (ip, res, callback) => {
 
         callback();
     };
-}
+};
 
 app
     .set("view engine", "ejs")
@@ -66,4 +66,21 @@ io
 
     })
 
-server.listen(config.port || 80, () => console.log(`Server is started (http://localhost:${config.port || 80})`.green))
+server.listen(config.port || 80, () => console.log(`Server is started (http://localhost:${config.port || 80})`.green));
+
+process.on('unhandledRejection', (reason, p) => {
+    console.log('[AntiCrash] Unhandled Rejection/Catch');
+    console.log(reason, p);
+});
+process.on("uncaughtException", (err, origin) => {
+    console.log('[AntiCrash] Uncaught Exception/Catch');
+    console.log(err, origin);
+})
+process.on('uncaughtExceptionMonitor', (err, origin) => {
+    console.log('[AntiCrash] Uncaught Exception/Catch (MONITOR)');
+    console.log(err, origin);
+});
+process.on('multipleResolves', (type, promise, reason) => {
+    console.log('[AntiCrash] Multiple Resolves');
+    console.log(type, promise, reason);
+});
