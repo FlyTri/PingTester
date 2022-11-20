@@ -171,12 +171,13 @@
             })
             .on("disconnect", (reason) => {
                 pingText.innerText = "N/A";
-                wifi.style.color = "red";
+                wifi.style.color = "white";
                 console.log("Socket disconnected with reason: " + reason || "No reason!");
             })
             .on("pong", (date) => {
                 toggle(download);
                 let ping = Date.now() - date;
+                if (ping >= 2500) return;
 
                 pingText.innerText = `${ping}`;
 
@@ -187,9 +188,6 @@
                 } else {
                     pingText.style.color = "#ff6b6b";
                 }
-            })
-            .on("pingResult", data => {
-                toggle(download);
             });
 
         setInterval(() => {
@@ -198,7 +196,7 @@
                 toggle(upload, true);
             }, () => {
                 toggle(upload, false);
-            }, 2000));
+            }, 2500));
         }, 3500)
     })()
 </script>
