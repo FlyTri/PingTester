@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ping Checker</title>
+    <title>Ping Tester</title>
     <meta name="description" content="Check your latency">
     <link rel="icon" type="image/x-icon"
         href="https://img.icons8.com/external-soft-fill-juicy-fish/512/external-ping-sports-soft-fill-soft-fill-juicy-fish-2.png">
@@ -120,7 +120,7 @@
         const wifi = document.getElementById("wifi");
         const upload = document.getElementById("upload");
         const download = document.getElementById("download");
-        io = () => { throw Error("io() has been removed!") };
+        io = [];
 
         $(document).ready(() => {
             $(".loader-wrapper").fadeOut("slow");
